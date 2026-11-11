@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="title desc">
+  <title id="title">templatenext compiles a restricted language to a bounded Rust VM</title>
+  <desc id="desc">JavaScript calls the Node API. A snapshot of own data descriptors crosses N-API into Rust. Lexer, parser, HIR, optimizer, bytecode, and a verifier feed a bounded VM. Helpers stay on the JS thread.</desc>
+  <rect width="960" height="440" rx="16" fill="#18181b"/>
+  <rect x="28" y="28" width="200" height="120" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="44" y="60" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">host</text>
+  <text x="44" y="92" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">Node API</text>
+  <text x="44" y="120" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">createTemplate()</text>
+  <rect x="268" y="28" width="220" height="120" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="284" y="60" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">boundary</text>
+  <text x="284" y="92" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">N-API snapshot</text>
+  <text x="284" y="120" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">own descriptors only</text>
+  <rect x="528" y="28" width="200" height="120" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="544" y="60" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">frontend</text>
+  <text x="544" y="92" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">lexer / parser</text>
+  <text x="544" y="120" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">HIR, no JS blocks</text>
+  <rect x="768" y="28" width="164" height="120" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="784" y="60" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">compile</text>
+  <text x="784" y="92" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">bytecode</text>
+  <text x="784" y="120" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">then verifier</text>
+  <rect x="140" y="196" width="400" height="120" rx="12" fill="#09090b" stroke="#e4e4e7"/>
+  <text x="156" y="228" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">runtime</text>
+  <text x="156" y="260" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18">bounded Rust VM</text>
+  <text x="156" y="292" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">instruction, loop, output limits</text>
+  <rect x="580" y="196" width="252" height="120" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="596" y="228" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">trusted, not sandboxed</text>
+  <text x="596" y="260" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">JS helpers / filters</text>
+  <text x="596" y="292" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">called on the JS thread</text>
+  <rect x="140" y="344" width="692" height="68" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="486" y="374" text-anchor="middle" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">HTML text, escaped unless SafeHtml</text>
+  <text x="486" y="396" text-anchor="middle" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">template source cannot call JS, open files, or hit the network</text>
+  <path d="M228 148 V196 H340" fill="none" stroke="#71717a" stroke-width="1.5"/>
+  <path d="M850 148 V256 H832" fill="none" stroke="#71717a" stroke-width="1.5"/>
+  <path d="M540 256 H580" fill="none" stroke="#71717a" stroke-width="1.5"/>
+  <path d="M340 316 V344" fill="none" stroke="#71717a" stroke-width="1.5"/>
+</svg>

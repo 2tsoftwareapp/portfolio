@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="title desc">
+  <title id="title">semvernext explain() names the comparator that failed</title>
+  <desc id="desc">A version and a range parse into comparator branches. satisfies() returns a boolean. explain() returns the canonical range, which branch failed, and whether a prerelease policy excluded the version.</desc>
+  <rect width="960" height="400" rx="16" fill="#18181b"/>
+  <rect x="28" y="36" width="200" height="140" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="44" y="68" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">inputs</text>
+  <text x="44" y="100" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">version</text>
+  <text x="44" y="128" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">range  ^1.0.0</text>
+  <text x="44" y="156" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">SemVer 2.0.0</text>
+  <rect x="292" y="36" width="250" height="140" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="308" y="68" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">canonical range</text>
+  <text x="308" y="100" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">&gt;=1.0.0 &lt;2.0.0-0</text>
+  <text x="308" y="128" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">one or more branches</text>
+  <text x="308" y="156" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">node-semver fixtures</text>
+  <rect x="606" y="28" width="326" height="80" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="622" y="60" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">satisfies()</text>
+  <text x="622" y="88" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">true / false</text>
+  <rect x="606" y="124" width="326" height="140" rx="12" fill="#09090b" stroke="#e4e4e7"/>
+  <text x="622" y="156" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">explain()</text>
+  <text x="622" y="188" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">failedComparator</text>
+  <text x="622" y="216" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">prerelease policy</text>
+  <text x="622" y="244" fill="#e4e4e7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">branch-level reasons</text>
+  <rect x="28" y="284" width="548" height="88" rx="12" fill="#09090b" stroke="#3f3f46"/>
+  <text x="48" y="320" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">2.0.0 vs ^1.0.0 fails on &lt;2.0.0-0</text>
+  <text x="48" y="348" fill="#a1a1aa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">the boolean was always there; the named comparator is the rewrite</text>
+  <path d="M228 106 H292" fill="none" stroke="#71717a" stroke-width="1.5"/>
+  <path d="M542 80 H606" fill="none" stroke="#71717a" stroke-width="1.5"/>
+  <path d="M542 140 H606" fill="none" stroke="#71717a" stroke-width="1.5"/>
+</svg>
