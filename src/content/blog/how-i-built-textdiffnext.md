@@ -19,7 +19,7 @@ That line is in the changelog. The library commit is [`bdf63a3`](https://github.
 
 ![A JavaScript string is UTF-16. textdiffnext diffs, patches, and serializes in that system. The UTF-8 helpers are gone.](/blog/textdiffnext-utf16.svg)
 
-The patch object still has fields named `utf8Start1`. They are not UTF-8. The names stayed so a caller that read Sanity's shape does not crash. The comment in [`createPatchObject.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/patch/createPatchObject.ts) is the contract.
+The patch object still has fields named `utf8Start1`. They are not UTF-8. The names stayed so a caller that read Sanity's shape does not crash. The comment in [`createPatchObject.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/patch/createPatchObject.ts) is the contract.
 
 ```ts
 export interface Patch {
@@ -54,7 +54,7 @@ if (!patchDiffLength && diffType !== DIFF_EQUAL) {
 }
 ```
 
-At the end of [`make.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/patch/make.ts):
+At the end of [`make.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/patch/make.ts):
 
 ```ts
 for (let i = 0; i < patches.length; i++) {
@@ -68,7 +68,7 @@ for (let i = 0; i < patches.length; i++) {
 
 ## The patch text uses the same numbers
 
-Unified-diff headers in [`stringify.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/patch/stringify.ts) are `start1` / `length1`, not `utf8Start1`.
+Unified-diff headers in [`stringify.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/patch/stringify.ts) are `start1` / `length1`, not `utf8Start1`.
 
 ```ts
 export function stringifyPatch(patch: Patch): string {
@@ -105,11 +105,11 @@ export function apply(
   const parsed = deepCopy(patches)
 ```
 
-The public name is `applyPatches`, re-exported from [`src/index.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/index.ts).
+The public name is `applyPatches`, re-exported from [`src/index.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/index.ts).
 
 ## Unpaired surrogates used to throw
 
-`encodeURI` rejects an isolated surrogate. A split emoji in a patch body is exactly that. [`uriText.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/utils/uriText.ts) encodes those code units as `%uXXXX` and leaves paired text to `encodeURI`.
+`encodeURI` rejects an isolated surrogate. A split emoji in a patch body is exactly that. [`uriText.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/utils/uriText.ts) encodes those code units as `%uXXXX` and leaves paired text to `encodeURI`.
 
 ```ts
 export function encodeUriText(text: string): string {
@@ -131,13 +131,15 @@ export function encodeUriText(text: string): string {
 
 Decode is the inverse: `%u` plus a surrogate range, then `String.fromCharCode`. Paired emoji still round-trip through `encodeURI`.
 
+That extension is the one place where the wire format is no longer Google-compatible. Google DMP rejects `%uXXXX` on parse, so patch text containing a split surrogate is textdiffnext-only. Patches without lone surrogates are byte-identical to Google's format and interoperate in both directions — the repository's cross-engine test parses and applies a Google patch string here, and a textdiffnext patch string in Google DMP.
+
 ## The 45 KB file
 
 The numbers are one machine, Bun 1.4.4, macOS arm64, from [`8c23050`](https://github.com/2tsoftwareapp/textdiffnext/commit/8c23050). They are not an SLA.
 
 On `code_long` (about 45 KB, 115 hunks) Sanity reported every hunk applied and the reconstructed text was not `b`. Patch 103 wanted offset 21,341 and landed at 21,158. `ServiceHandler_135` became `ServiceHandler_133`. textdiffnext matched all 115 hunks, 21,800 characters.
 
-On ~40 KB of JSON (`data_long`, 240 hunks) the same split: Sanity corrupted, textdiffnext matched 240/240. A 4 KB astral/CJK fixture threw `URIError: String contained an illegal UTF-16 sequence` in Sanity and passed here.
+On ~40 KB of JSON (`data_long`, 240 hunks) the same split: Sanity corrupted, textdiffnext matched 240/240. A 4 KB astral/CJK fixture threw `URIError: String contained an illegal UTF-16 sequence` while serializing in both Google DMP and Sanity; textdiffnext applied it and serialized it.
 
 Median `makePatches` + `applyPatches` on the 45 KB file: 7.12 ms against Sanity's 8.64 ms. The speed is a side effect of not translating indices. The reason to use the fork is the 115th hunk.
 
@@ -155,4 +157,4 @@ If you already store Sanity patches as UTF-8 byte offsets, this is not a drop-in
 - Repository: [2tsoftwareapp/textdiffnext](https://github.com/2tsoftwareapp/textdiffnext)
 - Library: [`bdf63a3`](https://github.com/2tsoftwareapp/textdiffnext/commit/bdf63a3)
 - Benchmarks and audits: [`8c23050`](https://github.com/2tsoftwareapp/textdiffnext/commit/8c23050)
-- Files: [`createPatchObject.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/patch/createPatchObject.ts), [`make.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/patch/make.ts), [`stringify.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/patch/stringify.ts), [`apply.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/patch/apply.ts), [`uriText.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/368e3f2/src/utils/uriText.ts)
+- Files: [`createPatchObject.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/patch/createPatchObject.ts), [`make.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/patch/make.ts), [`stringify.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/patch/stringify.ts), [`apply.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/patch/apply.ts), [`uriText.ts`](https://github.com/2tsoftwareapp/textdiffnext/blob/91b17a1/src/utils/uriText.ts)

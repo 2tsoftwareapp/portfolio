@@ -9,17 +9,17 @@ author: "Dao Quang Truong"
 coverImage: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80&w=1000"
 ---
 
-`satisfies("2.0.0", "^1.0.0")` is `false`. That is the entire conversation node-semver will have with you. [semvernext](https://github.com/2tsoftwareapp/semvernext) still returns the boolean. It also names the comparator. The tree is one commit, [`9094d3d`](https://github.com/2tsoftwareapp/semvernext/commit/9094d3d).
+`satisfies("2.0.0", "^1.0.0")` is `false`. That is the entire conversation node-semver will have with you. [semvernext](https://github.com/2tsoftwareapp/semvernext) still returns the boolean. It also names the comparator. The implementation is [`8ab5bcc`](https://github.com/2tsoftwareapp/semvernext/commit/8ab5bcc).
 
 > Designed with 100% test fixture fidelity against `node-semver@7.8.6`, zero external dependencies, and built-in dependency resolution diagnostics via `explain()`.
 
-The README says 144 increment cases. The loaded fixture is 133 rows. The test iterates the array, so it still passes. This post uses 133.
+The README now lists 133 increment rows, which is what the fixture contains. An earlier README said 144; the test iterates the array, so the wrong number never failed the suite. The fixture is the source of truth.
 
 ## Parse without a regex
 
 ![A version and a caret range become a canonical comparator set. satisfies() is a boolean. explain() keeps the failed comparator.](/blog/semvernext-explain.svg)
 
-[`parse`](https://github.com/2tsoftwareapp/semvernext/blob/9094d3d/src/index.ts) walks `charCodeAt`. Leading `v` is optional. Loose mode also accepts a leading `=`. Each numeric component rejects a leading zero and anything above `Number.MAX_SAFE_INTEGER`. If the cursor is not at the end of the string, the answer is `null`.
+[`parse`](https://github.com/2tsoftwareapp/semvernext/blob/8ab5bcc/src/index.ts) walks `charCodeAt`. Leading `v` is optional. Loose mode also accepts a leading `=`. Each numeric component rejects a leading zero and anything above `Number.MAX_SAFE_INTEGER`. If the cursor is not at the end of the string, the answer is `null`.
 
 ```ts
 export function parse(input: string, options: Options | boolean = {}): Version | null {
@@ -63,7 +63,7 @@ export interface ExplainResult {
 }
 ```
 
-[`explain`](https://github.com/2tsoftwareapp/semvernext/blob/9094d3d/src/index.ts) parses the version, constructs a `Range`, and if `r.test(v.version)` is true it stops. On failure it walks `r.set`. Each inner set is an AND of comparators. The first comparator that rejects the version becomes `failedComparator`.
+[`explain`](https://github.com/2tsoftwareapp/semvernext/blob/8ab5bcc/src/index.ts) parses the version, constructs a `Range`, and if `r.test(v.version)` is true it stops. On failure it walks `r.set`. Each inner set is an AND of comparators. The first comparator that rejects the version becomes `failedComparator`.
 
 ```ts
 for (const set of r.set) {
@@ -108,7 +108,7 @@ const reason = isPrereleaseExcluded
   : `Version ${v.version} does not satisfy range "${canonRange}"`;
 ```
 
-The tests in [`range.test.ts`](https://github.com/2tsoftwareapp/semvernext/blob/9094d3d/test/range.test.ts) lock three of the paths: a hit, a prerelease miss, a bound miss.
+The tests in [`range.test.ts`](https://github.com/2tsoftwareapp/semvernext/blob/8ab5bcc/test/range.test.ts) lock three of the paths: a hit, a prerelease miss, a bound miss.
 
 ```ts
 it("explains why version satisfies range", () => {
@@ -139,11 +139,11 @@ satisfies("1.2.3", "^1.0.0");
 explain("2.0.0", "^1.0.0");
 ```
 
-If you only need the boolean, node-semver is the library the ecosystem already has. If a lockfile conflict is a named comparator, this is the extra function.
+If you only need the boolean, node-semver is the library the ecosystem already has. If a lockfile conflict is a named comparator, this is the extra function. The package is not on the npm registry; build it from the repository with `bun install && bun run build`.
 
 ## References
 
 - Repository: [2tsoftwareapp/semvernext](https://github.com/2tsoftwareapp/semvernext)
-- Implementation: [`9094d3d`](https://github.com/2tsoftwareapp/semvernext/commit/9094d3d)
+- Implementation: [`8ab5bcc`](https://github.com/2tsoftwareapp/semvernext/commit/8ab5bcc)
 - Upstream pin: node-semver `v7.8.6`
-- Files: [`src/index.ts`](https://github.com/2tsoftwareapp/semvernext/blob/9094d3d/src/index.ts), [`test/range.test.ts`](https://github.com/2tsoftwareapp/semvernext/blob/9094d3d/test/range.test.ts)
+- Files: [`src/index.ts`](https://github.com/2tsoftwareapp/semvernext/blob/8ab5bcc/src/index.ts), [`test/range.test.ts`](https://github.com/2tsoftwareapp/semvernext/blob/8ab5bcc/test/range.test.ts)

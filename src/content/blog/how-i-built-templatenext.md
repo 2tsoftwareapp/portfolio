@@ -1,215 +1,238 @@
 ---
-title: "templatenext does not compile templates to JavaScript"
+title: "templatenext compiles templates to JavaScript and never trusts the template"
 date: "2026-11-11"
-description: "A restricted template language, verified bytecode, and a bounded Rust VM. Helpers stay on the JS thread. EJS and doT still win on speed; this engine wins on what template source is allowed to mean."
+description: "Version 0.2.0 deleted the Rust VM. Template source is parsed into a closed grammar, and code generation emits only JSON literals and parser-owned identifiers — so nothing written in a template becomes code."
 slug: "how-i-built-templatenext"
 published: true
-tags: ["Rust", "TypeScript", "Open Source"]
+tags: ["JavaScript", "Node.js", "Open Source"]
 author: "Dao Quang Truong"
 coverImage: "https://images.unsplash.com/photo-1607799279861-4dd421510fb2?auto=format&fit=crop&q=80&w=1000"
 ---
 
-EJS and doT turn a template into a JavaScript function and run it. That is fast. It is also "whatever this string evaluates to." [templatenext](https://github.com/2tsoftwareapp/templatenext) takes the other side: a closed expression language, compiled to bytecode, checked, then executed by a Rust VM with fuel. The GitHub history is one commit, [`c5f875a`](https://github.com/2tsoftwareapp/templatenext/commit/c5f875a). The mechanism is the compile pipeline.
+The first version of [templatenext](https://github.com/2tsoftwareapp/templatenext) compiled templates to bytecode and ran them in a Rust VM behind an N-API addon. It worked, and I deleted it. Version 0.2.0 compiles to a JavaScript function instead. The interesting part is not that it compiles to JavaScript — EJS and doT do that. It is what the compiler is allowed to emit.
 
-> Template source cannot call arbitrary JavaScript, access the filesystem, or make network requests. Helpers and filters are application-provided JavaScript callbacks; only register capabilities you trust.
+> Body is only JSON.stringify'd literals and parser-owned identifiers — never raw template text.
 
-## Host, snapshot, VM
+That comment sits above the `new Function` call in [`engine.cjs`](https://github.com/2tsoftwareapp/templatenext/blob/590da55/packages/templatenext/lib/engine.cjs). The commit is [`62ba3cc`](https://github.com/2tsoftwareapp/templatenext/commit/62ba3cc).
 
-![Node API, N-API snapshot, lexer/parser, bytecode plus verifier, bounded Rust VM. Helpers stay on the JS thread.](/blog/templatenext-vm.svg)
+## Why the VM went away
 
-JavaScript still owns the public API. [`createTemplate`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/packages/templatenext/lib/index.cjs) is a constructor wrapper. Compile crosses N-API with a snapshot of own data descriptors, not live Proxies.
+The CHANGELOG is blunt about it. The native escape addon only won on strings denser than roughly 10% special characters, and made realistic renders 1.7–4x slower. Once escaping was pure JavaScript, the VM was buying a language boundary at the cost of a native build, a per-platform binary, and a snapshot transport across N-API. The boundary is real, but it does not need a second runtime.
+
+The replacement keeps the property that mattered: template text never reaches the generated function body as code.
+
+![Template source is parsed into a closed grammar. Code generation emits only JSON literals and parser-owned identifiers. Render is a function call; helpers are pinned to slots.](/blog/templatenext-compile.svg)
+
+## The compiler emits three things
+
+Text nodes become `JSON.stringify` of the literal. Interpolations become a call to the runtime escape function. That is the whole of the text path in [`engine.cjs`](https://github.com/2tsoftwareapp/templatenext/blob/590da55/packages/templatenext/lib/engine.cjs).
 
 ```js
-function safeHtml(value) {
-  try { return adapter.safeHtml(value); }
-  catch (error) { throw new TemplateError(error.code, error.message); }
-}
-function createTemplate(options) { return new Template(options); }
-```
-
-On the Rust side the steps are linear. [`compile_program`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-node/src/lib.rs) is the whole frontend.
-
-```rust
-fn compile_program(text: &str, limits: CompilationLimits) -> Result<Program, CompileError> {
-    let source = Source::with_limits(text, limits.source)?;
-    let ast = Parser::new(&source).parse()?;
-    let hir = hir::lower(&ast)?;
-    bytecode::validate_string_limits(&hir, limits.bytecode.max_string_bytes)?;
-    bytecode::compile_with_limits(&optimizer::optimize(hir), limits.bytecode)
-}
-```
-
-There is no JS eval in that list.
-
-## Verify before the first instruction
-
-[`compile_with_limits`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/bytecode.rs) clamps caller limits to implementation ceilings (`MAX_INSTRUCTIONS = 131_072`, eight megabytes of bytecode) and does not return a `Program` until the verifier says the jumps and the stack are legal.
-
-```rust
-pub fn compile_with_limits(hir: &Hir, limits: BytecodeLimits) -> Result<Program, CompileError> {
-    // Caller-supplied limits can never bypass core implementation ceilings.
-    let limits = BytecodeLimits {
-        max_bytecode_bytes: limits.max_bytecode_bytes.min(MAX_BYTECODE_BYTES),
-        max_instructions: limits.max_instructions.min(MAX_INSTRUCTIONS),
-        max_stack_slots: limits.max_stack_slots.min(crate::verifier::MAX_STACK),
-        max_string_bytes: limits.max_string_bytes.min(MAX_POOL_STRING_BYTES),
-    };
-    let mut compiler = Compiler {
-        code: Vec::new(),
-        constants: Vec::new(),
-        names: Vec::new(),
-        name_ids: HashMap::new(),
-        pool_string_bytes: 0,
-        expression_start: None,
-        local_slots: hir.local_slots,
-        limits,
-        charged_bytes: std::mem::size_of::<Program>(),
-    };
-    compiler.check_bytes(compiler.charged_bytes, hir.span)?;
-    compiler.compile_nodes(&hir.nodes)?;
-    compiler.emit(InstructionKind::Halt, hir.span)?;
-    let mut program = Program {
-        code: compiler.code,
-        constants: compiler.constants,
-        names: compiler.names,
-        local_slots: compiler.local_slots,
-        max_stack: 0,
-        span: hir.span,
-    };
-    program.max_stack = crate::verifier::verify_with_stack_limit(&program, limits.max_stack_slots)?;
-    debug_assert_eq!(program.estimated_bytes(), compiler.charged_bytes);
-    Ok(program)
-}
-```
-
-[`verifier.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/verifier.rs) rejects an empty program, an oversized instruction list, bad constant pools, and branch targets that leave their region. Stack height is capped at 8,192.
-
-```rust
-pub fn verify_with_stack_limit(program: &Program, max_stack: u32) -> Result<u32, CompileError> {
-    let code_len = program.code.len();
-    if code_len == 0 {
-        return Err(invalid(program.span, "bytecode program is empty"));
+function compileBody(nodes, locals, strict, scopeNullable, plan) {
+  let out = '';
+  for (const node of nodes) {
+    if (node.type === 'text') {
+      if (node.value) out += `s+=${JSON.stringify(node.value)};`;
+      continue;
     }
-    if code_len > MAX_INSTRUCTIONS {
-        return Err(CompileError::limit(
-            program.span,
-            "bytecode instruction limit exceeded",
-        ));
+    if (node.type === 'esc') {
+      out += `s+=$.e(${compileExpr(node.expr, locals, strict, scopeNullable, plan)});`;
+      continue;
     }
-    validate_spans(program)?;
-    validate_pools(program)?;
-    let memberships = validate_instructions(program)?;
-    validate_branch_regions(program, &memberships)?;
-    verify_stack(program, max_stack.min(MAX_STACK))
-}
-```
-
-## Fuel is an instruction counter
-
-The VM loop in [`render.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/render.rs) asserts the program already verified, then charges one unit of fuel per instruction. Default fuel is 1,000,000. Default loop items 10,000. Default output 16 MiB.
-
-```rust
-fn execute(session: &mut Session<'_>, program: &Program, root: &Value) -> Result<(), CompileError> {
-    debug_assert!(
-        verifier::verify(program).is_ok(),
-        "bytecode must already be verified at compile time"
-    );
-    let mut stack: Vec<Value> = Vec::new();
-    let mut locals = vec![Value::undefined(); program.local_slots() as usize];
-    let mut frames: Vec<LoopFrame> = Vec::new();
-    let mut pc: usize = 0;
-    loop {
-        let Some(instruction) = program.instructions().get(pc) else {
-            return Err(CompileError::runtime(
-                Span::new(0, 0),
-                "execution reached past the end of the program",
-            ));
-        };
-        let span = instruction.span();
-        charge_fuel(session, pc, span)?;
-        match instruction.kind() {
-```
-
-```rust
-fn charge_fuel(session: &mut Session<'_>, pc: usize, span: Span) -> Result<(), CompileError> {
-    if session.fuel == 0 {
-        return Err(CompileError::limit(
-            span,
-            format!("vm fuel exhausted near instruction {pc}"),
-        ));
+    if (node.type === 'raw') {
+      out += `s+=$.raw(${compileExpr(node.expr, locals, strict, scopeNullable, plan)});`;
+      continue;
     }
-    session.fuel -= 1;
-    Ok(())
+```
+
+Expressions follow the same discipline. A literal goes through `litCode`, which is `JSON.stringify` plus two special cases.
+
+```js
+function litCode(value) {
+  if (value === undefined) return 'void 0';
+  if (typeof value === 'number' && Object.is(value, -0)) return '0';
+  return JSON.stringify(value);
 }
 ```
 
-Fuel does not interrupt a JavaScript helper that blocks. The README says that. The VM is a bound on template bytecode, not a sandbox around the callbacks you registered.
+A property read is either a dot access on an identifier the compiler matched against `/^[A-Za-z_][A-Za-z0-9_]*$/`, or a bracket access on a JSON-quoted string. Neither path can carry a `(` or a `;` from template text into the output.
 
-## Escaping is the default; raw is a brand
+```js
+function compileGet(objCode, keyNode, locals, strict, objNullable) {
+  if (!strict && keyNode.type === 'lit' && typeof keyNode.value === 'string') {
+    const k = JSON.stringify(keyNode.value);
+    const ident = /^[A-Za-z_][A-Za-z0-9_]*$/.test(keyNode.value);
+    const read = ident ? `${objCode}.${keyNode.value}` : `${objCode}[${k}]`;
+    if (objNullable) return `(${objCode}!=null?${read}:void 0)`;
+    return read;
+  }
+  return `$.g(${objCode},${compileExpr(keyNode, locals, strict, scopeNullable, true)})`;
+}
+```
 
-Ordinary interpolation always goes through `EscapeHtml`. [`ops.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/ops.rs) is the usual five replacements.
+The function body is assembled from those two primitives and a fixed prologue.
 
-```rust
-pub fn escape_html(input: &str) -> String {
-    let mut escaped = String::with_capacity(input.len());
-    for character in input.chars() {
-        match character {
-            '&' => escaped.push_str("&amp;"),
-            '<' => escaped.push_str("&lt;"),
-            '>' => escaped.push_str("&gt;"),
-            '"' => escaped.push_str("&quot;"),
-            '\'' => escaped.push_str("&#39;"),
-            _ => escaped.push(character),
-        }
+```js
+function generate(source, opts, limits) {
+  if (typeof source !== 'string') fail('ERR_TEMPLATE_TYPE', 'source must be a string');
+  if (Buffer.byteLength(source) > limits.maxSourceBytes) {
+    fail('ERR_TEMPLATE_LIMIT', 'maxSourceBytes exceeded');
+  }
+  const file = opts.name || '<anonymous>';
+  const ast = parse(source, (code, message, at) => syntax(code, message, at, file));
+  if (countNesting(ast) > limits.maxNestingDepth) fail('ERR_TEMPLATE_LIMIT', 'maxNestingDepth exceeded');
+  const plan = newPlan();
+  const body = compileBody(ast, new Set(), opts.strict, false, plan);
+  const code = `"use strict";let s="";const $root=ctx;let $s=ctx;let $tmp;let $r;${body}return s;`;
+  return { code, plan };
+}
+```
+
+`new Function` is still code generation, and the engine says so rather than hiding it. The parse happens first, the limits are checked before generation, and a runtime that blocks `new Function` gets a named error pointing at `precompile()`.
+
+```js
+function compileSource(engine, source, options) {
+  const opts = readOptions(options);
+  const limits = opts.limits || { ...DEFAULT_LIMITS };
+  const { code, plan } = generate(source, opts, limits);
+  let fn;
+  try {
+    // Body is only JSON.stringify'd literals and parser-owned identifiers — never raw template text.
+    fn = new Function('ctx', '$', '$h', '$f', code);
+  } catch (error) {
+    fail('ERR_TEMPLATE_SYNTAX', 'code generation is unavailable in this runtime (eval is blocked?); use precompile() at build time and load() at runtime', { cause: error });
+  }
+  return new CompiledTemplate(engine, source, opts.name, fn, limits, opts.strict, plan);
+}
+```
+
+If you want no `new Function` at runtime at all, `precompile()` returns a module expression at build time and `load()` wraps it without generating anything.
+
+```js
+  precompile(source, options) {
+    const opts = readOptions(options);
+    const limits = opts.limits ? { ...this._limits, ...opts.limits } : this._limits;
+    const strict = opts.strict === true || this._strict;
+    const { code, plan } = generate(source, { ...opts, limits, strict }, limits);
+    return `{v:1,name:${JSON.stringify(opts.name ?? null)},helpers:${JSON.stringify(plan.helperNames)},` +
+      `filters:${JSON.stringify(plan.filterNames)},strict:${strict},` +
+      `fn:function(ctx,$,$h,$f){${code}}}`;
+  }
+```
+
+The output is JavaScript, so load only artifacts you generated. That is the same trust boundary as a build artifact, not a new one.
+
+## Escaping is the default and raw output is a brand
+
+`{{value}}` escapes. `{{! value}}` emits raw only for a value made by `safeHtml()`. The brand is `WeakSet` membership, not a property on the object, so a caller cannot forge it by setting `__html`.
+
+```js
+function safeHtml(html) {
+  if (typeof html !== 'string') fail('ERR_TEMPLATE_TYPE', 'safeHtml() requires a string');
+  const box = Object.freeze(Object.create(null));
+  SAFE.add(box);
+  SAFE_HTML.set(box, html);
+  return box;
+}
+
+function unwrapSafe(value) {
+  return SAFE.has(value) ? SAFE_HTML.get(value) : null;
+}
+```
+
+Escaping has two paths. Fields up to 80 code units go through a hand-written loop; longer strings take a regex `replace`. The loop captures `String.prototype.charCodeAt` and `slice` at module load and calls them with `.call`.
+
+```js
+const SHORT_ESCAPE = 80;
+
+// charCodeAt/slice are captured once and invoked via .call: code that runs
+// Object.create(String.prototype) (Nunjucks runtime) turns String.prototype into a
+// dictionary-mode object, after which `text.charCodeAt(i)` loses inlining (~3x slower).
+// Measured with that trigger present: method call 270 ns vs captured .call 90 ns per field.
+const charCodeAt = String.prototype.charCodeAt;
+const sliceStr = String.prototype.slice;
+
+function escapeShort(text) {
+  let out = '';
+  let last = 0;
+  for (let i = 0; i < text.length; i++) {
+    let r;
+    switch (charCodeAt.call(text, i)) {
+      case 38: r = '&amp;'; break;
+      case 60: r = '&lt;'; break;
+      case 62: r = '&gt;'; break;
+      case 34: r = '&quot;'; break;
+      case 39: r = '&#39;'; break;
+      default: continue;
     }
-    escaped
+    if (last !== i) out += sliceStr.call(text, last, i);
+    out += r;
+    last = i + 1;
+  }
+  if (last === 0) return text;
+  return last === text.length ? out : out + sliceStr.call(text, last);
 }
 ```
 
-[`emit_escaped`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/output.rs) escapes `SafeHtml` too. Raw output is a different opcode, and it refuses anything that is not branded.
+That comment is the whole reason the loop exists in this shape. A benchmark harness that loads Nunjucks in the same process turns `String.prototype` into a dictionary-mode object, and the ordinary method call loses its inline cache. Capturing the function once survives it.
 
-```rust
-pub fn emit_raw(&mut self, value: &Value, span: Span) -> Result<(), CompileError> {
-    let ValueKind::SafeHtml(safe) = value.kind() else {
-        return Err(runtime(span, "raw output requires a SafeHtml value"));
-    };
-    self.append(safe.payload(), span)
+## Helpers are slots, not lookups
+
+A helper name is resolved at compile time into an index in an array. The call site is a direct array read plus an inlined counter, and the label is only set while the call runs so the outer `try` can still name what threw.
+
+```js
+// A helper/filter call compiles to a direct slot call plus an inlined call counter.
+// `$.hn` carries the label only while the call runs, so the outer try/catch in
+// render() can still attribute a throw without a per-call try/catch.
+function callCode(arrayName, slot, label, args) {
+  return `(++$.hc>$.mh&&$.lim(),$.hn=${JSON.stringify(label)},$r=${arrayName}[${slot}](${args.join(',')}),$.hn=null,$r)`;
 }
 ```
 
-HTML escaping is not URL validation. It is not a CSS or JavaScript context. The engine will happily escape a string you then drop into `href`. That is still your problem.
+The array is rebuilt when the registry changes, so registering a helper after compiling does not leave a stale slot.
 
-## Speed is mixed, on purpose
+## What the numbers say
 
-One host, Linux x64, Intel i5-10400, Node v24.21.0. TemplateNext 0.1.0 against EJS 7.0.2, Eta 4.6.0, doT 1.1.3, Handlebars 4.7.10, Nunjucks 3.2.4. Warm-render p50 batch mean, microseconds per op.
+One run, Node v24.21.0, Linux x64, Intel i5-10400. templatenext 0.2.0 against EJS 7.0.2, Eta 4.6.0, doT 1.1.3, Handlebars 4.7.10, Nunjucks 3.2.4. The run first required byte-exact output (84 assertions), then measured 378 isolated process cells and 3,402 batch samples, each engine in its own process. Warm-render p50 batch mean, µs per op.
 
-| Workload | TemplateNext | Fastest other | Ratio |
-| --- | ---: | --- | ---: |
-| 80% HTML-escaping string | 80.85 | EJS 252.27 | 0.32× (led) |
-| 20 interpolations | 76.82 | Eta 9.20 | 8.4× slower |
-| Catalog page + partials | 332.47 | doT 10.83 | 30.7× slower |
-| 1,000-item loop | 1,407.16 | doT 253.01 | 5.6× slower |
-| Identity helper × 20 | 104.65 | doT 5.39 | 19.4× slower |
+| Workload | templatenext | doT | Eta | EJS | Handlebars | Nunjucks |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 20 interpolations | **2.74** | 8.87 | 10.00 | 18.97 | 11.41 | 10.52 |
+| 1,000-item loop | **97.9** | 272 | 344 | 569 | 320 | 1094 |
+| Catalog page + partials | **5.87** | 10.92 | 13.64 | 40.44 | 29.12 | 52.76 |
+| Identity helper × 20 | **1.54** | 5.05 | 6.09 | 12.01 | 8.99 | 6.90 |
+| 80% HTML-escaping string | 267 | 291 | 272 | **260** | 270 | 301 |
 
-It led only when most of the work was escaping. A compiled JavaScript function that returns a constant string will beat a VM. The product claim is the language, not the leaderboard.
+templatenext was fastest on five of seven fixtures. On the escaping-heavy fixture it sits with the pack at 1.02× of the fastest, because long strings full of markup go through the regex path and the short-string loop stops helping once most characters need replacing. On the static-page fixture doT and Eta return a constant string, so that row is not a ranking.
 
-The native addon is Linux x64 glibc. Node 22, 24, and 26 were checked locally. Bun, Deno, WASM, and other OS/arch combinations are out of this MVP. The package is not on npm yet.
+Batch rendering is where the shape of the API shows up. 10,000 invoices of 730 B rendered at 8.5–12.7 µs per document. Writing them one `writeFileSync` at a time cost 22.5 µs per file; through the default 64-way pool, 14.8 µs. Writing files, not rendering, is the bulk of a batch job.
+
+The suite reported 80 passing tests across nine files, including a real-output suite that compares bytes against an independent oracle and checks document structure with `parse5`. It passed on Node 26.12.1, 24.22.1, and 24.5.0. Bun, Deno, and WASM are not verified, and neither are live Workers or Vercel Edge runtimes — the organisation's Actions billing has blocked CI runs, so the workflow exists but has not executed remotely.
 
 ```js
 const { createTemplate } = require('@templatenext/core');
 
 const engine = createTemplate();
-engine.registerPartial('row', engine.compile('<li>{{= it}}</li>'));
-const page = engine.compile(
-  '<h1>{{= it.title}}</h1><ul>{{each it.items as item}}{{include "row" with item}}{{/each}}</ul>',
-);
-page.render({ title: 'Updates', items: ['One', 'Two'] });
+engine.registerPartial('row', engine.compile('<li>{{name}}</li>'));
+const page = engine.compile('<h1>{{title}}</h1><ul>{{#items}}{{>row}}{{/}}</ul>');
+
+page.render({ title: 'Updates', items: [{ name: 'One' }, { name: 'Two' }] });
+// <h1>Updates</h1><ul><li>One</li><li>Two</li></ul>
 ```
 
-If the template author is also the application author, EJS is simpler. If the template author is a tenant, the VM is the point.
+The package is not on npm. It ships CommonJS, ESM, and TypeScript declarations as plain files with no build step and no runtime dependencies.
+
+## What this is not
+
+It is not a sandbox. Helpers and filters are application callbacks, and render limits do not interrupt a callback that runs too long. HTML escaping is for HTML text output; it does not validate a URL or make a value safe inside a script or a style attribute.
+
+If the template author is also the application author, EJS is simpler and has more users. The reason to pick this one is that template text stays data at every step of the pipeline, and that property survives a tenant editing the template.
 
 ## References
 
 - Repository: [2tsoftwareapp/templatenext](https://github.com/2tsoftwareapp/templatenext) (private)
-- Curated tree: [`c5f875a`](https://github.com/2tsoftwareapp/templatenext/commit/c5f875a)
-- Files: [`lib.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-node/src/lib.rs), [`bytecode.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/bytecode.rs), [`verifier.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/verifier.rs), [`render.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/render.rs), [`output.rs`](https://github.com/2tsoftwareapp/templatenext/blob/c5f875a/crates/templatenext-core/src/output.rs)
+- 0.2.0 rewrite: [`62ba3cc`](https://github.com/2tsoftwareapp/templatenext/commit/62ba3cc)
+- v0.1 leftovers removed: [`68e993f`](https://github.com/2tsoftwareapp/templatenext/commit/68e993f)
+- Changelog and license: [`b65e014`](https://github.com/2tsoftwareapp/templatenext/commit/b65e014)
+- README restructure: [`590da55`](https://github.com/2tsoftwareapp/templatenext/commit/590da55)
+- Files: [`engine.cjs`](https://github.com/2tsoftwareapp/templatenext/blob/590da55/packages/templatenext/lib/engine.cjs), [`parse.cjs`](https://github.com/2tsoftwareapp/templatenext/blob/590da55/packages/templatenext/lib/parse.cjs)

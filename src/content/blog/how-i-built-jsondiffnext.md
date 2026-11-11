@@ -131,7 +131,7 @@ One exploratory run on Node v24.21.0, Intel i5-10400, 19 fixture cells × 21 sam
 | `jsondiffpatch` | 28.84 ms | 22.46% | 123.1 MiB |
 | `rfc6902` | 19.89 ms | 38.36% | 120.4 MiB |
 
-Hashing is a material part of the time. The table is not a ranking of the three libraries as raw engines. Different adapters take different fallbacks and emit different patch sizes. At 20,000 array elements every measured cell used `native-admission-root-replace`. [`bfe5889`](https://github.com/2tsoftwareapp/jsondiffnext/commit/bfe5889) is the commit that stopped the README from implying otherwise.
+Hashing is a material part of the time. The table is not a ranking of the three libraries as raw engines. Different adapters take different fallbacks and emit different patch sizes. At 20,000 array elements the measured cases used admission fallbacks, so those cells are the wrapper's root replacement, not the engine's own diff. [`bfe5889`](https://github.com/2tsoftwareapp/jsondiffnext/commit/bfe5889) is the commit that stopped the README from implying otherwise.
 
 The usage that the package actually exports:
 
