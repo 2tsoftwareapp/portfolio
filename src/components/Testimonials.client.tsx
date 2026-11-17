@@ -39,30 +39,36 @@ export function TestimonialsClient() {
     <section
       id="testimonials"
       ref={sectionRef}
-      className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-muted/20 to-background"
+      className="relative py-24 px-4 sm:px-6 lg:px-8 border-t border-border bg-background"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
-          className="text-center mb-16"
+          className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center mb-4">
-            <Quote className="h-8 w-8 text-foreground mr-3" />
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-mono">
+          <div className="mb-4 flex items-center gap-4">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              [05 // ENDORSEMENTS]
+            </span>
+            <div className="h-px flex-1 bg-border" aria-hidden="true" />
+          </div>
+          <div className="flex items-center gap-3 mb-3">
+            <Quote className="h-7 w-7 text-primary flex-shrink-0" />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
               Testimonials
             </h2>
           </div>
-          <p className="text-base text-muted-foreground uppercase tracking-widest font-mono">
+          <p className="text-sm text-muted-foreground uppercase tracking-widest font-mono">
             What People Say About Working With Me
           </p>
         </motion.div>
 
         {/* Testimonials grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-l border-border"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
@@ -71,13 +77,20 @@ export function TestimonialsClient() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-card p-6 rounded-lg border border-border"
+              className="border-r border-b border-border bg-card p-6 rounded-none flex flex-col justify-between"
             >
-              <Quote className="h-6 w-6 text-primary mb-4" />
-              <p className="text-muted-foreground mb-6 italic">"{testimonial.quote}"</p>
               <div>
-                <p className="font-bold text-foreground">{testimonial.author}</p>
-                <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                <div className="flex items-center justify-between pb-4 mb-4 border-b border-border/60">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                    REF.0{index + 1}
+                  </span>
+                  <Quote className="h-4 w-4 text-primary" />
+                </div>
+                <p className="text-muted-foreground mb-6 leading-relaxed">"{testimonial.quote}"</p>
+              </div>
+              <div className="pt-4 border-t border-border/60">
+                <p className="font-bold font-mono text-sm text-foreground">{testimonial.author}</p>
+                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mt-1">{testimonial.role}</p>
               </div>
             </motion.div>
           ))}

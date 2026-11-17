@@ -138,30 +138,36 @@ export function GitHubStatsClient() {
     <section
       id="github-stats"
       ref={sectionRef}
-      className="relative py-16 px-4 sm:px-6 lg:px-8 bg-muted/30"
+      className="relative py-24 px-4 sm:px-6 lg:px-8 border-t border-border bg-background"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
-          className="text-center mb-12"
+          className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center mb-4">
-            <Github className="h-8 w-8 text-foreground mr-3" />
-            <h2 className="text-3xl sm:text-4xl font-bold font-mono">
+          <div className="mb-4 flex items-center gap-4">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              [04 // TELEMETRY]
+            </span>
+            <div className="h-px flex-1 bg-border" aria-hidden="true" />
+          </div>
+          <div className="flex items-center gap-3 mb-3">
+            <Github className="h-7 w-7 text-primary flex-shrink-0" />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
               GitHub Footprint
             </h2>
           </div>
-          <p className="text-base text-muted-foreground uppercase tracking-widest font-mono">
+          <p className="text-sm text-muted-foreground uppercase tracking-widest font-mono">
             Real public signals from github.com/{githubUsername}
           </p>
         </motion.div>
 
         {/* Stats grid */}
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-6"
+          className="grid grid-cols-2 md:grid-cols-4 gap-0 border-t border-l border-border"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
@@ -170,13 +176,18 @@ export function GitHubStatsClient() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-card p-6 rounded-lg border border-border text-center"
+              className="border-r border-b border-border bg-card p-6 text-left rounded-none"
             >
-              <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-3xl font-bold text-foreground mb-2">
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  GH.0{index + 1}
+                </span>
+                <stat.icon className="h-4 w-4 text-primary" />
+              </div>
+              <div className="font-mono text-3xl font-bold text-foreground mb-1">
                 {loading ? '...' : stat.value.toLocaleString()}
               </div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
+              <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{stat.label}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -193,15 +204,15 @@ export function GitHubStatsClient() {
                 href={stats.latestRepo.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-muted-foreground/50"
+                className="rounded-none border border-border bg-card p-5 transition-colors hover:border-primary/60"
               >
-                <div className="mb-2 text-xs font-mono uppercase tracking-[0.24em] text-muted-foreground">
+                <div className="mb-2 text-xs font-mono uppercase tracking-[0.24em] text-primary">
                   Recently active repo
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-lg font-semibold text-foreground">{stats.latestRepo.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-lg font-bold font-mono text-foreground">{stats.latestRepo.name}</div>
+                    <div className="text-xs font-mono text-muted-foreground mt-1">
                       Updated {new Date(stats.latestRepo.pushedAt).toLocaleDateString()}
                     </div>
                   </div>
@@ -215,15 +226,15 @@ export function GitHubStatsClient() {
                 href={stats.featuredRepo.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-muted-foreground/50"
+                className="rounded-none border border-border bg-card p-5 transition-colors hover:border-primary/60"
               >
-                <div className="mb-2 text-xs font-mono uppercase tracking-[0.24em] text-muted-foreground">
+                <div className="mb-2 text-xs font-mono uppercase tracking-[0.24em] text-primary">
                   Most starred public repo
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-lg font-semibold text-foreground">{stats.featuredRepo.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-lg font-bold font-mono text-foreground">{stats.featuredRepo.name}</div>
+                    <div className="text-xs font-mono text-muted-foreground mt-1">
                       {stats.featuredRepo.stars.toLocaleString()} stars
                     </div>
                   </div>
@@ -239,29 +250,29 @@ export function GitHubStatsClient() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="mt-12 bg-card p-6 rounded-lg border border-border"
+          className="mt-8 bg-card p-6 rounded-none border border-border"
         >
-          <h3 className="text-xl font-bold mb-4 text-center">Contribution Activity</h3>
-          <div className="flex justify-center">
-            <div className="overflow-x-auto w-full flex justify-center">
-              <img 
-                src={`https://ghchart.rshah.org/4f46d4/${githubUsername}`} 
-                alt={`${githubUsername}'s GitHub chart`}
-                className="rounded-lg border border-border max-w-full shadow-sm"
-                style={{ minWidth: '600px', maxWidth: '100%', height: 'auto' }}
-              />
-            </div>
-          </div>
-          <div className="mt-6 flex justify-center">
-            <a 
-              href={`https://github.com/${githubUsername}`} 
-              target="_blank" 
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-border/60">
+            <h3 className="text-lg font-bold font-mono uppercase tracking-wider">Contribution Activity</h3>
+            <a
+              href={`https://github.com/${githubUsername}`}
+              target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-md hover:opacity-90 transition-opacity text-sm font-bold font-mono"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors text-xs font-bold font-mono uppercase tracking-wider self-start sm:self-auto"
             >
               <Github className="h-4 w-4" />
               View GitHub Profile
             </a>
+          </div>
+          <div className="flex justify-center">
+            <div className="overflow-x-auto w-full flex justify-center">
+              <img
+                src={`https://ghchart.rshah.org/ff4f00/${githubUsername}`}
+                alt={`${githubUsername}'s GitHub chart`}
+                className="rounded-none border border-border max-w-full bg-background/50 p-2"
+                style={{ minWidth: '600px', maxWidth: '100%', height: 'auto' }}
+              />
+            </div>
           </div>
         </motion.div>
 
@@ -269,7 +280,7 @@ export function GitHubStatsClient() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-4 p-4 bg-destructive/20 text-destructive rounded-lg text-center"
+            className="mt-4 p-4 bg-destructive/20 border border-destructive text-destructive rounded-none text-center font-mono text-xs"
           >
             Error loading GitHub stats: {error}
           </motion.div>

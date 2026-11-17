@@ -44,25 +44,31 @@ export function CertificatesClient() {
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
-          className="text-center mb-16"
+          className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center mb-4">
-            <BadgeCheck className="h-8 w-8 text-foreground mr-3" />
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-mono">
+          <div className="mb-4 flex items-center gap-4">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              [03 // CREDENTIALS]
+            </span>
+            <div className="h-px flex-1 bg-border" aria-hidden="true" />
+          </div>
+          <div className="flex items-center gap-3 mb-3">
+            <BadgeCheck className="h-7 w-7 text-primary flex-shrink-0" />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
               Certifications
             </h2>
           </div>
-          <p className="text-base text-muted-foreground uppercase tracking-widest font-mono">
+          <p className="text-sm text-muted-foreground uppercase tracking-widest font-mono">
             Professional Credentials & Training
           </p>
         </motion.div>
 
         {/* Certificates grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-border"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
@@ -71,31 +77,38 @@ export function CertificatesClient() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow"
+              className="border-r border-b border-border bg-card p-6 rounded-none hover:bg-secondary/20 transition-colors flex flex-col justify-between"
             >
-              <div className="flex items-start mb-4">
-                <BadgeCheck className="h-6 w-6 text-primary mr-3 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-lg font-bold text-foreground">{cert.title}</h3>
-                  <p className="text-primary font-medium">{cert.issuer}</p>
+              <div>
+                <div className="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-border/60">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                    CERT.{String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground bg-secondary/50 border border-border px-2 py-0.5 rounded-none">
+                    {cert.year}
+                  </span>
                 </div>
+                <div className="flex items-start mb-4">
+                  <BadgeCheck className="h-5 w-5 text-primary mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground font-mono tracking-tight">{cert.title}</h3>
+                    <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mt-1">{cert.issuer}</p>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{cert.description}</p>
               </div>
-              <p className="text-muted-foreground text-sm mb-4">{cert.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                  {cert.year}
-                </span>
-                {cert.credentialUrl && (
-                  <a 
-                    href={cert.credentialUrl} 
-                    target="_blank" 
+              {cert.credentialUrl && (
+                <div className="pt-4 border-t border-border/60">
+                  <a
+                    href={cert.credentialUrl}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline"
+                    className="font-mono text-xs font-bold uppercase tracking-wider text-primary hover:underline"
                   >
-                    Verify Credential
+                    Verify Credential →
                   </a>
-                )}
-              </div>
+                </div>
+              )}
             </motion.div>
           ))}
         </motion.div>

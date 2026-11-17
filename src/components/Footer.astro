@@ -6,29 +6,30 @@ import { appInfo } from "@/lib/config";
   Footer component displaying version and license information
   This appears at the bottom of every page
 -->
-<footer class="w-full py-6 border-t border-white/5 mt-auto">
+<footer class="w-full py-6 border-t border-border bg-card/50 mt-auto">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 text-xs font-mono text-muted-foreground">
       {/* Version Information */}
-      <div class="flex items-center gap-3 text-sm text-muted-foreground/80">
-        <span class="font-mono">
-          v{appInfo.version} ({appInfo.hash})
+      <div class="flex items-center justify-center sm:justify-start gap-2">
+        <span class="h-2 w-2 bg-primary" aria-hidden="true" />
+        <span>
+          REV // v{appInfo.version} ({appInfo.hash})
         </span>
+      </div>
+
+      {/* Copyright */}
+      <div class="text-center">
+        <p class="text-muted-foreground/70">
+          {appInfo.license.copyright}. All rights reserved.
+        </p>
       </div>
 
       {/* License Information */}
-      <div class="flex items-center gap-3 text-sm text-muted-foreground/80">
-        <span class="font-mono uppercase tracking-wider">
-          {appInfo.license.name}
+      <div class="flex items-center justify-center sm:justify-end gap-2">
+        <span class="uppercase tracking-wider">
+          LIC // {appInfo.license.name}
         </span>
       </div>
-    </div>
-
-    {/* Copyright */}
-    <div class="mt-4 text-center">
-      <p class="text-xs font-mono text-muted-foreground/50">
-        {appInfo.license.copyright}. All rights reserved.
-      </p>
     </div>
   </div>
 </footer>

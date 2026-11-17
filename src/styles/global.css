@@ -26,37 +26,37 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
-/* Senior engineering editorial theme - high contrast zinc with restrained motion */
+/* Swiss Industrial / Precision Hardware theme - warm carbon with signal orange */
 :root {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
+  --background: 30 6% 6%;
+  --foreground: 40 15% 94%;
 
-  --card: 240 10% 6%;
-  --card-foreground: 0 0% 98%;
+  --card: 30 5% 8.5%;
+  --card-foreground: 40 15% 94%;
 
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 30 6% 6%;
+  --popover-foreground: 40 15% 94%;
 
-  --primary: 0 0% 98%;
-  --primary-foreground: 240 5.9% 10%;
+  --primary: 19 100% 50%;
+  --primary-foreground: 30 6% 6%;
 
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 30 5% 13%;
+  --secondary-foreground: 40 15% 94%;
 
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
+  --muted: 30 5% 12%;
+  --muted-foreground: 35 6% 60%;
 
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 19 100% 50%;
+  --accent-foreground: 30 6% 6%;
 
-  --destructive: 0 62.8% 30.6%;
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
-  
-  --radius: 0.5rem;
+  --border: 30 5% 18%;
+  --input: 30 5% 18%;
+  --ring: 19 100% 50%;
+
+  --radius: 0rem;
 }
 
 * {
@@ -85,26 +85,24 @@ html {
 
 body {
   @apply bg-background text-foreground antialiased;
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(240, 10%, 15%, 0.15) 0, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(240, 10%, 10%, 0.1) 0, transparent 50%);
+  background-image:
+    radial-gradient(at 100% 0%, hsla(19, 100%, 50%, 0.05) 0, transparent 50%);
   background-attachment: fixed;
 }
 
-/* === Basic Developer Styles === */
+/* === Swiss Industrial Developer Styles === */
 
 .blog-card {
-  @apply relative overflow-hidden rounded-lg bg-card border border-border transition-all duration-200;
+  @apply relative overflow-hidden rounded-none bg-card border border-border transition-colors duration-200;
 }
 
 .blog-card:hover {
-  @apply border-foreground/30 bg-muted/30;
-  transform: translateY(-2px);
+  @apply border-primary/60 bg-muted/40;
 }
 
 /* === Typography === */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   letter-spacing: -0.04em;
 }
 
@@ -182,7 +180,7 @@ article code:not(pre code) {
 }
 
 .blog-tag {
-  @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border border-border bg-muted/50 text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/30;
+  @apply inline-flex items-center rounded-none px-2 py-1 text-xs font-mono font-medium border border-border bg-muted/50 text-muted-foreground transition-colors hover:text-foreground hover:border-primary/60;
 }
 
 @layer utilities {
