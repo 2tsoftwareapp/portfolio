@@ -2,7 +2,7 @@
 
 import { motion, type Variants } from 'framer-motion';
 import { useSafeReducedMotion } from '@/hooks/useSafeReducedMotion';
-import { ArrowRight, Mail, Download, MapPin, Sparkles } from 'lucide-react';
+import { ArrowRight, Mail, Download, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { personalInfo, uiStrings } from '@/lib/config';
@@ -111,7 +111,17 @@ export function HeroClient({
       className="relative min-h-screen flex items-center overflow-hidden px-4 sm:px-6 lg:px-8 pb-24 pt-28 sm:pt-32"
     >
       <div className="relative z-10 max-w-7xl mx-auto w-full">
-        <div className="grid items-center gap-16 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
+        <div className="mb-10 border border-border bg-card px-4 py-2.5 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
+          <div className="truncate">
+            <span className="text-primary font-bold">truongdq@oxide-node</span>
+            <span className="text-muted-foreground">:~/portfolio$ ./inspect --profile --live</span>
+          </div>
+          <span className="text-muted-foreground hidden sm:inline">
+            SESSION: tty1 | LATENCY: <span className="text-primary">-50%</span> | TESTS: <span className="text-primary">183 PASS</span>
+          </span>
+        </div>
+
+        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)]">
           <motion.div
             className="max-w-3xl text-left"
             variants={containerVariants}
@@ -119,30 +129,30 @@ export function HeroClient({
             animate="visible"
           >
             <motion.div
-              className="inline-flex items-center gap-3 border-l-2 border-primary pl-4 text-xs font-mono font-bold uppercase tracking-[0.2em] text-muted-foreground"
+              className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary"
               variants={itemVariants}
             >
-              <span className="text-primary">///</span>
+              <span className="text-primary">&gt;</span>
               {uiStrings.hero.eyebrow}
             </motion.div>
 
             <motion.h1
               id="hero-title"
-              className="mt-6 text-5xl font-bold tracking-[-0.06em] text-foreground sm:text-6xl lg:text-8xl"
+              className="mt-4 font-mono text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground"
               variants={itemVariants}
             >
               {title}
             </motion.h1>
 
             <motion.p
-              className="mt-5 text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
+              className="mt-4 font-mono text-lg sm:text-xl text-primary"
               variants={itemVariants}
             >
-              {personalInfo.role}
+              // {personalInfo.role}
             </motion.p>
 
             <motion.p
-              className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg"
+              className="mt-5 max-w-2xl font-mono text-sm sm:text-base leading-7 text-muted-foreground"
               variants={itemVariants}
             >
               {subtitle}
@@ -150,13 +160,13 @@ export function HeroClient({
 
             <motion.ul
               aria-label={uiStrings.hero.focusLabel}
-              className="mt-8 grid gap-3 text-sm font-medium text-foreground sm:grid-cols-2"
+              className="mt-8 border border-border bg-card/80 p-4 grid sm:grid-cols-2 gap-3 font-mono text-xs text-foreground"
               variants={itemVariants}
             >
               {personalInfo.focusAreas.map((area) => (
-                <li key={area} className="flex items-center gap-3">
-                  <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-                  {area}
+                <li key={area} className="flex items-center gap-2.5">
+                  <span className="text-primary font-bold" aria-hidden="true">[OK]</span>
+                  <span>{area}</span>
                 </li>
               ))}
             </motion.ul>
@@ -169,13 +179,14 @@ export function HeroClient({
                 <motion.a
                   key={index}
                   href={button.href}
-                  className={`group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold transition-all duration-200 sm:w-auto ${button.variant === 'primary'
-                    ? 'bg-primary text-primary-foreground hover:opacity-90'
-                    : 'border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  className={`group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-none px-6 py-3 font-mono text-xs uppercase tracking-wider font-bold transition-colors duration-200 sm:w-auto ${button.variant === 'primary'
+                    ? 'bg-primary text-primary-foreground border border-primary hover:bg-primary/90'
+                    : 'border border-border bg-card text-foreground hover:border-primary/70'
                     }`}
                   whileHover={shouldReduceMotion ? {} : { y: -2 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                 >
+                  {button.variant === 'primary' && <span aria-hidden="true">[⏎]</span>}
                   {button.label}
                   {button.icon && (
                     <span className="transition-transform group-hover:translate-x-1">
@@ -187,19 +198,19 @@ export function HeroClient({
             </motion.div>
 
             <motion.div
-              className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-muted-foreground"
+              className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 font-mono text-xs text-muted-foreground"
               variants={itemVariants}
             >
-              <a className="inline-flex items-center gap-2 hover:text-foreground" href={`mailto:${personalInfo.email}`}>
-                <Mail className="h-4 w-4" aria-hidden="true" />
+              <a className="inline-flex items-center gap-2 hover:text-primary transition-colors" href={`mailto:${personalInfo.email}`}>
+                <Mail className="h-4 w-4 text-primary" aria-hidden="true" />
                 {personalInfo.email}
               </a>
-              <span className="hidden text-border sm:inline" aria-hidden="true">/</span>
+              <span className="hidden text-border sm:inline" aria-hidden="true">|</span>
               <span className="inline-flex items-center gap-2">
-                <MapPin className="h-4 w-4" aria-hidden="true" />
+                <MapPin className="h-4 w-4 text-primary" aria-hidden="true" />
                 {personalInfo.location}
               </span>
-              <span className="hidden text-border sm:inline" aria-hidden="true">/</span>
+              <span className="hidden text-border sm:inline" aria-hidden="true">|</span>
               <div className="flex items-center gap-4">
                 {personalInfo.socials.map((social) => (
                   <a
@@ -207,7 +218,7 @@ export function HeroClient({
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-muted-foreground transition-colors hover:text-primary"
                     aria-label={social.platform}
                   >
                     <social.icon className="h-5 w-5" />
@@ -219,76 +230,77 @@ export function HeroClient({
 
           <motion.aside
             aria-label={uiStrings.hero.snapshotLabel}
-            className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.04] p-6 shadow-2xl shadow-black/20 sm:p-8"
+            className="relative overflow-hidden rounded-none border border-border bg-card p-0 shadow-none"
             variants={itemVariants}
             initial="hidden"
             animate="visible"
           >
-            <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
-            <div className="relative">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                {uiStrings.hero.snapshotLabel}
-              </p>
-              <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8">
-                {personalInfo.stats.map((stat) => (
-                  <div key={stat.label}>
-                    <dd className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{stat.value}</dd>
-                    <dt className="mt-2 text-xs leading-5 text-muted-foreground">{stat.label}</dt>
+            <div className="border-b border-border bg-secondary px-5 py-2.5 flex items-center justify-between gap-2 font-mono text-xs">
+              <span className="text-foreground font-semibold truncate">
+                ┌─ [ sys.telemetry // {uiStrings.hero.snapshotLabel} ]
+              </span>
+              <span className="text-primary font-bold shrink-0">● ONLINE</span>
+            </div>
+
+            <dl className="p-6 grid grid-cols-2 gap-6 border-b border-border">
+              {personalInfo.stats.map((stat) => (
+                <div key={stat.label}>
+                  <dd className="font-mono text-3xl sm:text-4xl font-bold text-primary">{stat.value}</dd>
+                  <div className="font-mono text-[10px] text-primary/60 tracking-tighter mt-1" aria-hidden="true">
+                    ████████░░
                   </div>
-                ))}
-              </dl>
+                  <dt className="font-mono text-xs text-muted-foreground mt-1 leading-5">{stat.label}</dt>
+                </div>
+              ))}
+            </dl>
 
-              <div className="mt-10 border-t border-border/70 pt-6">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  {uiStrings.hero.currentFocusLabel}
-                </p>
-                <p className="mt-3 text-sm leading-7 text-foreground">
-                  Building reliable full-stack applications, reporting workflows, and cross-platform products.
-                </p>
-              </div>
-
+            <div className="p-6 font-mono">
+              <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                # {uiStrings.hero.currentFocusLabel}
+              </p>
+              <p className="mt-2.5 text-xs leading-6 text-foreground/90">
+                Building reliable full-stack applications, reporting workflows, and cross-platform products.
+              </p>
               <a
                 href="#experience"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
+                className="mt-6 inline-flex items-center gap-2 text-xs font-bold text-primary hover:underline"
               >
-                Review professional experience
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <span>$ cd ./experience -&gt;</span>
               </a>
             </div>
           </motion.aside>
         </div>
 
         <motion.div
-          className="mt-16 flex flex-col gap-3 border-t border-border pt-5 text-sm sm:flex-row sm:items-center sm:justify-between"
+          className="mt-12 border border-border bg-card px-4 py-3 font-mono text-xs flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           variants={itemVariants}
           initial="hidden"
           animate="visible"
           data-testid="typing-animation"
         >
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Current technical lens
+          <span className="text-muted-foreground">
+            <span className="text-primary font-bold">zsh ❯</span> role --current
           </span>
-          <span className="font-mono text-foreground" aria-live="polite">
+          <span className="text-foreground" aria-live="polite">
             {typingText}
-            <span className="ml-1 inline-block h-4 w-0.5 animate-pulse bg-primary align-middle" aria-hidden="true" />
+            <span className="ml-1.5 inline-block h-4 w-2.5 animate-pulse bg-primary align-middle" aria-hidden="true" />
           </span>
         </motion.div>
       </div>
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:block"
-        initial={{ opacity: 0, y: -10 }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden sm:block"
+        initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.5 }}
+        transition={{ delay: 1, duration: 0.4 }}
       >
-        <motion.div
-          className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full p-1"
-          animate={shouldReduceMotion ? {} : { y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+        <a
+          href="#skills"
+          className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
         >
-          <motion.div className="w-1 h-2 bg-muted-foreground/50 rounded-full mx-auto" />
-        </motion.div>
+          $ scroll --down ↓
+        </a>
       </motion.div>
     </section>
   );

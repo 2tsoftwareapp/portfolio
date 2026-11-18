@@ -29,29 +29,30 @@ export default function Navigation() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-white/5 bg-background/60 backdrop-blur-xl shadow-2xl">
+    <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-border bg-background/95 backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <a href="/" className="text-xl font-bold font-mono tracking-tighter text-foreground hover:text-foreground/80 transition-all duration-300">
-              {uiStrings.common.logo}
+          <div className="flex items-center gap-3">
+            <span className="bg-primary text-primary-foreground px-2 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wider">
+              NORMAL
+            </span>
+            <a href="/" className="text-base sm:text-lg font-bold font-mono tracking-tight text-foreground hover:text-primary transition-colors duration-200">
+              ~/{uiStrings.common.logo.toLowerCase()}
             </a>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            {navLinks.map(({ label, href }) => (
+          <div className="hidden md:flex items-center gap-5">
+            {navLinks.map(({ label, href }, index) => (
               <a
                 key={label}
                 href={href}
-                className="relative text-sm font-mono font-medium uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors group"
+                className="relative font-mono text-xs text-muted-foreground hover:text-primary transition-colors group"
               >
-                {label}
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover:w-full" />
+                [{index + 1}:{label}]
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary transition-all duration-200 group-hover:w-full" />
               </a>
             ))}
-
-
           </div>
 
           {/* Mobile Menu Button */}

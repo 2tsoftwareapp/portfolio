@@ -40,7 +40,7 @@ export function LiveWorkFloatClient() {
         <motion.div
           animate={floatAnimation}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border bg-card/80 
+          className="flex items-center gap-3 sm:gap-4 rounded-none border border-primary/50 bg-card/95 
             px-3 py-3 sm:px-5 sm:py-4 
             shadow-xl backdrop-blur-sm
             max-w-[200px] sm:max-w-none"
@@ -48,15 +48,15 @@ export function LiveWorkFloatClient() {
           <motion.div
             animate={{
               boxShadow: [
-                '0 0 0 rgba(59,130,246,0.0)',
-                '0 0 24px rgba(59,130,246,0.25)',
-                '0 0 0 rgba(59,130,246,0.0)',
+                '0 0 0 rgba(6,223,114,0.0)',
+                '0 0 22px rgba(6,223,114,0.22)',
+                '0 0 0 rgba(6,223,114,0.0)',
               ],
             }}
             transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute inset-0 rounded-2xl pointer-events-none"
+            className="absolute inset-0 rounded-none pointer-events-none"
           />
-          <div className="h-9 w-9 sm:h-12 sm:w-12 rounded-xl border border-border bg-background/80 p-1.5 sm:p-2 flex-shrink-0">
+          <div className="h-9 w-9 sm:h-12 sm:w-12 rounded-none border border-border bg-background/80 p-1.5 sm:p-2 flex-shrink-0">
             <img
               src="/livework/vietis-icon.png"
               alt="Viet IS"

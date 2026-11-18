@@ -39,30 +39,33 @@ export function TestimonialsClient() {
     <section
       id="testimonials"
       ref={sectionRef}
-      className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-muted/20 to-background"
+      className="relative py-24 px-4 sm:px-6 lg:px-8 border-t border-border bg-background"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
-          className="text-center mb-16"
+          className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center mb-4">
-            <Quote className="h-8 w-8 text-foreground mr-3" />
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-mono">
+          <p className="font-mono text-xs text-primary mb-2">
+            truongdq@oxide-node:~$ tail -n 3 /var/log/peer-reviews.log
+          </p>
+          <div className="flex items-center gap-3 mb-3">
+            <Quote className="h-7 w-7 text-primary flex-shrink-0" />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-mono">
               Testimonials
             </h2>
           </div>
-          <p className="text-base text-muted-foreground uppercase tracking-widest font-mono">
-            What People Say About Working With Me
+          <p className="text-sm text-muted-foreground font-mono">
+            # What People Say About Working With Me
           </p>
         </motion.div>
 
         {/* Testimonials grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
@@ -71,13 +74,18 @@ export function TestimonialsClient() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-card p-6 rounded-lg border border-border"
+              className="bg-card p-6 rounded-none border border-border hover:border-primary/60 transition-colors flex flex-col justify-between"
             >
-              <Quote className="h-6 w-6 text-primary mb-4" />
-              <p className="text-muted-foreground mb-6 italic">"{testimonial.quote}"</p>
               <div>
-                <p className="font-bold text-foreground">{testimonial.author}</p>
-                <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                <div className="flex items-center justify-between border-b border-border pb-3 mb-4 font-mono text-xs">
+                  <span className="text-primary font-bold">[ACK // PEER_REVIEW]</span>
+                  <Quote className="h-4 w-4 text-primary" />
+                </div>
+                <p className="text-muted-foreground font-mono text-sm mb-6 leading-relaxed">"{testimonial.quote}"</p>
+              </div>
+              <div className="pt-3 border-t border-border font-mono">
+                <p className="font-bold text-sm text-foreground">{testimonial.author}</p>
+                <p className="text-xs text-primary mt-0.5">{testimonial.role}</p>
               </div>
             </motion.div>
           ))}

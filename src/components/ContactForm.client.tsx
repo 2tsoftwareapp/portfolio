@@ -101,22 +101,27 @@ export function ContactFormClient() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-2xl mx-auto space-y-8"
+      className="max-w-2xl space-y-6 border border-border bg-card p-6 sm:p-8"
       data-testid="contact-form"
     >
+      <div className="border-b border-border pb-3 font-mono text-xs text-primary flex items-center justify-between">
+        <span>[stdin // message_buffer]</span>
+        <span className="text-muted-foreground">UTF-8</span>
+      </div>
+
       {/* Name Field */}
       <div className="space-y-2">
-        <label htmlFor="name" className="text-xs uppercase tracking-[0.2em] font-bold text-muted-foreground/70 font-mono">
+        <label htmlFor="name" className="text-xs uppercase tracking-wider font-bold text-primary font-mono">
           {uiStrings.contact.form.nameLabel}
         </label>
         <div className="relative group">
-          <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+          <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
             id="name"
             type="text"
             autoComplete="name"
             {...register('name')}
-            className="w-full pl-12 pr-4 py-4 bg-secondary/20 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all font-mono text-sm"
+            className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors font-mono text-sm"
             placeholder={uiStrings.contact.form.namePlaceholder}
             data-testid="contact-name-input"
           />
@@ -134,17 +139,17 @@ export function ContactFormClient() {
 
       {/* Email Field */}
       <div className="space-y-2">
-        <label htmlFor="email" className="text-xs uppercase tracking-[0.2em] font-bold text-muted-foreground/70 font-mono">
+        <label htmlFor="email" className="text-xs uppercase tracking-wider font-bold text-primary font-mono">
           {uiStrings.contact.form.emailLabel}
         </label>
         <div className="relative group">
-          <Mail aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+          <Mail aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
             id="email"
             type="email"
             autoComplete="email"
             {...register('email')}
-            className="w-full pl-12 pr-4 py-4 bg-secondary/20 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all font-mono text-sm"
+            className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors font-mono text-sm"
             placeholder={uiStrings.contact.form.emailPlaceholder}
             data-testid="contact-email-input"
           />
@@ -162,16 +167,16 @@ export function ContactFormClient() {
 
       {/* Message Field */}
       <div className="space-y-2">
-        <label htmlFor="message" className="text-xs uppercase tracking-[0.2em] font-bold text-muted-foreground/70 font-mono">
+        <label htmlFor="message" className="text-xs uppercase tracking-wider font-bold text-primary font-mono">
           {uiStrings.contact.form.messageLabel}
         </label>
         <div className="relative group">
-          <MessageSquare aria-hidden="true" className="absolute left-4 top-5 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+          <MessageSquare aria-hidden="true" className="absolute left-4 top-4 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <textarea
             id="message"
             {...register('message')}
-            rows={6}
-            className="w-full pl-12 pr-4 py-4 bg-secondary/20 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all resize-none font-mono text-sm"
+            rows={5}
+            className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors resize-none font-mono text-sm"
             placeholder={uiStrings.contact.form.messagePlaceholder}
             data-testid="contact-message-input"
           />
@@ -191,12 +196,12 @@ export function ContactFormClient() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full px-6 py-4 bg-foreground text-background rounded-lg font-bold font-mono text-xs uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="w-full px-6 py-4 bg-primary text-primary-foreground rounded-none font-bold font-mono text-xs uppercase tracking-widest hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         data-testid="contact-submit-button"
       >
         {isSubmitting ? (
           <>
-            <div className="h-4 w-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
+            <div className="h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
             {uiStrings.contact.form.submittingButton}
           </>
         ) : (
@@ -216,13 +221,13 @@ export function ContactFormClient() {
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-3 text-green-600 dark:text-green-400 backdrop-blur-sm shadow-sm"
+              className="p-4 bg-primary/10 border border-primary/40 rounded-none flex items-center gap-3 text-primary"
               data-testid="contact-success-message"
             >
-              <div className="p-1 bg-green-500/20 rounded-full">
+              <div className="p-1 bg-primary/20 rounded-none">
                 <CheckCircle aria-hidden="true" className="h-5 w-5 flex-shrink-0" />
               </div>
-              <p className="font-medium text-sm sm:text-base">
+              <p className="font-mono text-xs sm:text-sm">
                 {uiStrings.contact.messages.success}
               </p>
             </motion.div>
@@ -232,13 +237,13 @@ export function ContactFormClient() {
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-3 text-destructive backdrop-blur-sm shadow-sm"
+              className="p-4 bg-destructive/10 border border-destructive/40 rounded-none flex items-center gap-3 text-destructive"
               data-testid="contact-error-message"
             >
-              <div className="p-1 bg-destructive/20 rounded-full">
+              <div className="p-1 bg-destructive/20 rounded-none">
                 <AlertCircle aria-hidden="true" className="h-5 w-5 flex-shrink-0" />
               </div>
-              <p className="font-medium text-sm sm:text-base">
+              <p className="font-mono text-xs sm:text-sm">
                 {errorMessage || uiStrings.contact.messages.error}
               </p>
             </motion.div>
@@ -248,4 +253,3 @@ export function ContactFormClient() {
     </form>
   );
 }
-

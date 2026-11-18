@@ -44,19 +44,22 @@ export function CertificatesClient() {
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
-          className="text-center mb-16"
+          className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center mb-4">
-            <BadgeCheck className="h-8 w-8 text-foreground mr-3" />
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-mono">
+          <p className="font-mono text-xs text-primary mb-2">
+            truongdq@oxide-node:~$ gpg --verify-credentials --all
+          </p>
+          <div className="flex items-center gap-3 mb-3">
+            <BadgeCheck className="h-7 w-7 text-primary flex-shrink-0" />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-mono">
               Certifications
             </h2>
           </div>
-          <p className="text-base text-muted-foreground uppercase tracking-widest font-mono">
-            Professional Credentials & Training
+          <p className="text-sm text-muted-foreground font-mono">
+            # Professional Credentials &amp; Training
           </p>
         </motion.div>
 
@@ -71,31 +74,36 @@ export function CertificatesClient() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow"
+              className="bg-card p-6 rounded-none border border-border hover:border-primary/60 transition-colors flex flex-col justify-between"
             >
-              <div className="flex items-start mb-4">
-                <BadgeCheck className="h-6 w-6 text-primary mr-3 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-lg font-bold text-foreground">{cert.title}</h3>
-                  <p className="text-primary font-medium">{cert.issuer}</p>
+              <div>
+                <div className="flex items-center justify-between gap-2 border-b border-border pb-3 mb-4 font-mono text-xs">
+                  <span className="text-primary font-bold">[GPG:VERIFIED]</span>
+                  <span className="text-muted-foreground bg-secondary border border-border px-2 py-0.5 rounded-none">
+                    {cert.year}
+                  </span>
                 </div>
+                <div className="flex items-start mb-4">
+                  <BadgeCheck className="h-5 w-5 text-primary mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="text-lg font-bold font-mono text-foreground">{cert.title}</h3>
+                    <p className="text-primary font-mono text-xs mt-1">{cert.issuer}</p>
+                  </div>
+                </div>
+                <p className="text-muted-foreground font-mono text-sm mb-4 leading-relaxed">{cert.description}</p>
               </div>
-              <p className="text-muted-foreground text-sm mb-4">{cert.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                  {cert.year}
-                </span>
-                {cert.credentialUrl && (
-                  <a 
-                    href={cert.credentialUrl} 
-                    target="_blank" 
+              {cert.credentialUrl && (
+                <div className="pt-3 border-t border-border">
+                  <a
+                    href={cert.credentialUrl}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline"
+                    className="font-mono text-xs font-bold text-primary hover:underline"
                   >
-                    Verify Credential
+                    $ verify --credential -&gt;
                   </a>
-                )}
-              </div>
+                </div>
+              )}
             </motion.div>
           ))}
         </motion.div>
