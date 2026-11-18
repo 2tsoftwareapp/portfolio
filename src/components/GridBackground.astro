@@ -1,18 +1,9 @@
 <div class="fixed inset-0 -z-50 overflow-hidden pointer-events-none bg-background">
-  <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] animate-grid-flow"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_75%_45%_at_50%_0%,hsla(38,40%,65%,0.06),transparent_70%)]"></div>
+  <div class="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8">
+    <div class="h-full border-x border-border/30 grid grid-cols-12">
+      <div class="hidden lg:block col-span-4 border-r border-border/25"></div>
+      <div class="hidden lg:block col-span-8"></div>
+    </div>
+  </div>
 </div>
-
-<style>
-  @keyframes grid-flow {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: 24px 24px;
-    }
-  }
-
-  .animate-grid-flow {
-    animation: grid-flow 2s linear infinite;
-  }
-</style>

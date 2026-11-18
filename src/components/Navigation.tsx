@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { personalInfo, navLinks, uiStrings } from '@/lib/config';
 
+const ROMAN_NUMERALS = ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.', 'VII.', 'VIII.'];
+
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,29 +31,33 @@ export default function Navigation() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-white/5 bg-background/60 backdrop-blur-xl shadow-2xl">
+    <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-border bg-background/90 backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <a href="/" className="text-xl font-bold font-mono tracking-tighter text-foreground hover:text-foreground/80 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <a href="/" className="font-serif italic text-2xl tracking-tight text-foreground hover:text-primary transition-colors duration-200">
               {uiStrings.common.logo}
             </a>
+            <span className="hidden lg:inline-block border-l border-border pl-3 text-xs font-serif italic text-muted-foreground">
+              Vol. VI — Monograph
+            </span>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            {navLinks.map(({ label, href }) => (
+            {navLinks.map(({ label, href }, index) => (
               <a
                 key={label}
                 href={href}
-                className="relative text-sm font-mono font-medium uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors group"
+                className="relative flex items-baseline text-sm font-medium tracking-wide text-muted-foreground hover:text-foreground transition-colors group"
               >
-                {label}
+                <span className="font-serif italic text-primary mr-1.5 text-xs">
+                  {ROMAN_NUMERALS[index] ?? `${index + 1}.`}
+                </span>
+                <span>{label}</span>
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
-
-
           </div>
 
           {/* Mobile Menu Button */}
@@ -78,7 +84,7 @@ export default function Navigation() {
             className="fixed inset-0 top-16 z-[90] bg-background md:hidden overflow-hidden"
           >
             <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] px-4">
-              <div className="flex flex-col items-start gap-8 min-w-[200px]">
+              <div className="flex flex-col items-start gap-7 min-w-[220px]">
                 {navLinks.map(({ label, href }, index) => (
                   <motion.a
                     key={label}
@@ -87,9 +93,11 @@ export default function Navigation() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => setIsOpen(false)}
-                    className="text-2xl font-mono font-bold uppercase tracking-widest text-foreground hover:text-primary transition-all duration-300 text-left flex items-baseline group"
+                    className="text-2xl font-serif text-foreground hover:text-primary transition-all duration-300 text-left flex items-baseline group"
                   >
-                    <span className="text-muted-foreground/20 mr-4 text-sm font-medium">0{index + 1} //</span>
+                    <span className="font-serif italic text-primary mr-4 text-base">
+                      {ROMAN_NUMERALS[index] ?? `${index + 1}.`}
+                    </span>
                     <span className="relative">
                       {label}
                       <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover:w-full" />

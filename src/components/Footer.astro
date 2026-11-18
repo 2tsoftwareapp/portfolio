@@ -6,29 +6,18 @@ import { appInfo } from "@/lib/config";
   Footer component displaying version and license information
   This appears at the bottom of every page
 -->
-<footer class="w-full py-6 border-t border-white/5 mt-auto">
+<footer class="w-full py-8 border-t border-border mt-auto">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-      {/* Version Information */}
-      <div class="flex items-center gap-3 text-sm text-muted-foreground/80">
-        <span class="font-mono">
-          v{appInfo.version} ({appInfo.hash})
-        </span>
-      </div>
-
-      {/* License Information */}
-      <div class="flex items-center gap-3 text-sm text-muted-foreground/80">
-        <span class="font-mono uppercase tracking-wider">
-          {appInfo.license.name}
-        </span>
-      </div>
-    </div>
-
-    {/* Copyright */}
-    <div class="mt-4 text-center">
-      <p class="text-xs font-mono text-muted-foreground/50">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 font-serif italic text-sm text-muted-foreground">
+      <span>
+        Monograph Edition · v{appInfo.version} ({appInfo.hash})
+      </span>
+      <p class="text-center text-muted-foreground/80">
         {appInfo.license.copyright}. All rights reserved.
       </p>
+      <span>
+        {appInfo.license.name}
+      </span>
     </div>
   </div>
 </footer>

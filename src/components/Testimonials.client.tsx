@@ -39,49 +39,54 @@ export function TestimonialsClient() {
     <section
       id="testimonials"
       ref={sectionRef}
-      className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-muted/20 to-background"
+      className="relative py-24 px-4 sm:px-6 lg:px-8 border-t border-border"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Section header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center justify-center mb-4">
-            <Quote className="h-8 w-8 text-foreground mr-3" />
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-mono">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Sticky Chapter Header */}
+          <motion.div
+            className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="font-serif italic text-lg text-primary mb-3">
+              Chapter V — Critical Reception
+            </p>
+            <h2 className="font-serif text-4xl sm:text-5xl font-medium mb-4">
               Testimonials
             </h2>
-          </div>
-          <p className="text-base text-muted-foreground uppercase tracking-widest font-mono">
-            What People Say About Working With Me
-          </p>
-        </motion.div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              What People Say About Working With Me
+            </p>
+            <div className="w-12 h-0.5 bg-primary mt-6" aria-hidden="true" />
+          </motion.div>
 
-        {/* Testimonials grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
-        >
-          {testimonialsData.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              className="bg-card p-6 rounded-lg border border-border"
-            >
-              <Quote className="h-6 w-6 text-primary mb-4" />
-              <p className="text-muted-foreground mb-6 italic">"{testimonial.quote}"</p>
-              <div>
-                <p className="font-bold text-foreground">{testimonial.author}</p>
-                <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+          {/* Literary blockquotes */}
+          <motion.div
+            className="lg:col-span-8 border-b border-border"
+            variants={containerVariants}
+            initial="hidden"
+            animate={isInView ? 'visible' : 'hidden'}
+          >
+            {testimonialsData.map((testimonial, index) => (
+              <motion.blockquote
+                key={index}
+                variants={itemVariants}
+                className="border-t border-border py-8"
+              >
+                <Quote className="h-5 w-5 text-primary mb-4" aria-hidden="true" />
+                <p className="font-serif italic text-xl sm:text-2xl leading-relaxed text-foreground/90 mb-6">
+                  "{testimonial.quote}"
+                </p>
+                <footer className="flex items-baseline gap-3">
+                  <span className="font-medium text-foreground">{testimonial.author}</span>
+                  <span className="font-serif italic text-sm text-muted-foreground">— {testimonial.role}</span>
+                </footer>
+              </motion.blockquote>
+            ))}
+          </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -138,142 +138,148 @@ export function GitHubStatsClient() {
     <section
       id="github-stats"
       ref={sectionRef}
-      className="relative py-16 px-4 sm:px-6 lg:px-8 bg-muted/30"
+      className="relative py-24 px-4 sm:px-6 lg:px-8 border-t border-border"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Section header */}
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center justify-center mb-4">
-            <Github className="h-8 w-8 text-foreground mr-3" />
-            <h2 className="text-3xl sm:text-4xl font-bold font-mono">
-              GitHub Footprint
-            </h2>
-          </div>
-          <p className="text-base text-muted-foreground uppercase tracking-widest font-mono">
-            Real public signals from github.com/{githubUsername}
-          </p>
-        </motion.div>
-
-        {/* Stats grid */}
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
-        >
-          {statItems.map((stat, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              className="bg-card p-6 rounded-lg border border-border text-center"
-            >
-              <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-3xl font-bold text-foreground mb-2">
-                {loading ? '...' : stat.value.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {(stats?.latestRepo || stats?.featuredRepo) && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Sticky Chapter Header */}
           <motion.div
+            className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="mt-8 grid gap-4 md:grid-cols-2"
+            transition={{ duration: 0.6 }}
           >
-            {stats.latestRepo && (
-              <a
-                href={stats.latestRepo.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-muted-foreground/50"
-              >
-                <div className="mb-2 text-xs font-mono uppercase tracking-[0.24em] text-muted-foreground">
-                  Recently active repo
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-lg font-semibold text-foreground">{stats.latestRepo.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      Updated {new Date(stats.latestRepo.pushedAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </a>
-            )}
-
-            {stats.featuredRepo && (
-              <a
-                href={stats.featuredRepo.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-muted-foreground/50"
-              >
-                <div className="mb-2 text-xs font-mono uppercase tracking-[0.24em] text-muted-foreground">
-                  Most starred public repo
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-lg font-semibold text-foreground">{stats.featuredRepo.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {stats.featuredRepo.stars.toLocaleString()} stars
-                    </div>
-                  </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </a>
-            )}
+            <p className="font-serif italic text-lg text-primary mb-3">
+              Chapter IV — Open Source Index
+            </p>
+            <h2 className="font-serif text-4xl sm:text-5xl font-medium mb-4">
+              GitHub Footprint
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Real public signals from github.com/{githubUsername}
+            </p>
+            <div className="w-12 h-0.5 bg-primary mt-6" aria-hidden="true" />
           </motion.div>
-        )}
 
-        {/* Contribution graph */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="mt-12 bg-card p-6 rounded-lg border border-border"
-        >
-          <h3 className="text-xl font-bold mb-4 text-center">Contribution Activity</h3>
-          <div className="flex justify-center">
-            <div className="overflow-x-auto w-full flex justify-center">
-              <img 
-                src={`https://ghchart.rshah.org/4f46d4/${githubUsername}`} 
-                alt={`${githubUsername}'s GitHub chart`}
-                className="rounded-lg border border-border max-w-full shadow-sm"
-                style={{ minWidth: '600px', maxWidth: '100%', height: 'auto' }}
-              />
-            </div>
-          </div>
-          <div className="mt-6 flex justify-center">
-            <a 
-              href={`https://github.com/${githubUsername}`} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-md hover:opacity-90 transition-opacity text-sm font-bold font-mono"
+          {/* Telemetry content */}
+          <div className="lg:col-span-8">
+            {/* Stats grid */}
+            <motion.div
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-b border-border py-8"
+              variants={containerVariants}
+              initial="hidden"
+              animate={isInView ? 'visible' : 'hidden'}
             >
-              <Github className="h-4 w-4" />
-              View GitHub Profile
-            </a>
-          </div>
-        </motion.div>
+              {statItems.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  className="text-left"
+                >
+                  <stat.icon className="h-4 w-4 text-primary mb-2" />
+                  <div className="font-serif italic text-4xl text-foreground mb-1">
+                    {loading ? '...' : stat.value.toLocaleString()}
+                  </div>
+                  <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{stat.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
 
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 p-4 bg-destructive/20 text-destructive rounded-lg text-center"
-          >
-            Error loading GitHub stats: {error}
-          </motion.div>
-        )}
+            {(stats?.latestRepo || stats?.featuredRepo) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="mt-8 grid gap-6 md:grid-cols-2"
+              >
+                {stats.latestRepo && (
+                  <a
+                    href={stats.latestRepo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-none border border-border bg-card/50 p-5 transition-colors hover:border-primary/50"
+                  >
+                    <div className="mb-2 font-serif italic text-xs text-primary">
+                      Recently active repo
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="font-serif text-xl text-foreground">{stats.latestRepo.name}</div>
+                        <div className="text-xs font-mono text-muted-foreground mt-1">
+                          Updated {new Date(stats.latestRepo.pushedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </a>
+                )}
+
+                {stats.featuredRepo && (
+                  <a
+                    href={stats.featuredRepo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-none border border-border bg-card/50 p-5 transition-colors hover:border-primary/50"
+                  >
+                    <div className="mb-2 font-serif italic text-xs text-primary">
+                      Most starred public repo
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="font-serif text-xl text-foreground">{stats.featuredRepo.name}</div>
+                        <div className="text-xs font-mono text-muted-foreground mt-1">
+                          {stats.featuredRepo.stars.toLocaleString()} stars
+                        </div>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </a>
+                )}
+              </motion.div>
+            )}
+
+            {/* Contribution graph */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="mt-8 bg-card/50 p-6 rounded-none border border-border"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
+                <h3 className="font-serif text-xl font-medium text-foreground">Contribution Activity</h3>
+                <a
+                  href={`https://github.com/${githubUsername}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors text-xs font-medium tracking-wide self-start sm:self-auto"
+                >
+                  <Github className="h-4 w-4" />
+                  View GitHub Profile
+                </a>
+              </div>
+              <div className="flex justify-center">
+                <div className="overflow-x-auto w-full flex justify-center">
+                  <img
+                    src={`https://ghchart.rshah.org/e54324/${githubUsername}`}
+                    alt={`${githubUsername}'s GitHub chart`}
+                    className="rounded-none border border-border max-w-full bg-background/40 p-2"
+                    style={{ minWidth: '600px', maxWidth: '100%', height: 'auto' }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-4 p-4 bg-destructive/20 border border-destructive/40 text-destructive rounded-none font-serif italic text-sm"
+              >
+                Error loading GitHub stats: {error}
+              </motion.div>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

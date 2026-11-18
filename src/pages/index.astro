@@ -27,15 +27,23 @@ import { uiStrings } from '@/lib/config';
 		<!-- Contact Section -->
 		<section id="contact" aria-labelledby="contact-heading" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-border">
 			<div class="max-w-7xl mx-auto">
-				<div class="text-center mb-20">
-						<h2 id="contact-heading" class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+				<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+					<div class="lg:col-span-4 lg:sticky lg:top-28 lg:self-start">
+						<p class="font-serif italic text-lg text-primary mb-3">
+							Chapter VII — Correspondence
+						</p>
+						<h2 id="contact-heading" class="font-serif text-4xl sm:text-5xl font-medium mb-4">
 							{uiStrings.contact.title}
 						</h2>
-						<p class="text-base text-muted-foreground uppercase tracking-widest font-mono">
+						<p class="text-sm text-muted-foreground leading-relaxed">
 							{uiStrings.contact.subtitle}
-					</p>
+						</p>
+						<div class="w-12 h-0.5 bg-primary mt-6" aria-hidden="true" />
+					</div>
+					<div class="lg:col-span-8">
+						<ContactFormClient client:visible />
+					</div>
 				</div>
-				<ContactFormClient client:visible />
 			</div>
 		</section>
 	</main>

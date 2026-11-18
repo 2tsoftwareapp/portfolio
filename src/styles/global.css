@@ -26,37 +26,37 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
-/* Senior engineering editorial theme - high contrast zinc with restrained motion */
+/* Neo-Editorial Monograph theme - obsidian ink, warm parchment & vermilion seal */
 :root {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
+  --background: 150 12% 5.5%;
+  --foreground: 38 28% 92%;
 
-  --card: 240 10% 6%;
-  --card-foreground: 0 0% 98%;
+  --card: 150 10% 8%;
+  --card-foreground: 38 28% 92%;
 
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 150 12% 5.5%;
+  --popover-foreground: 38 28% 92%;
 
-  --primary: 0 0% 98%;
-  --primary-foreground: 240 5.9% 10%;
+  --primary: 11 80% 52%;
+  --primary-foreground: 38 28% 96%;
 
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 150 8% 12%;
+  --secondary-foreground: 38 28% 92%;
 
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
+  --muted: 150 8% 11%;
+  --muted-foreground: 36 14% 64%;
 
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 11 80% 52%;
+  --accent-foreground: 38 28% 96%;
 
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 38 28% 96%;
 
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
-  
-  --radius: 0.5rem;
+  --border: 38 15% 18%;
+  --input: 38 15% 18%;
+  --ring: 11 80% 52%;
+
+  --radius: 0.125rem;
 }
 
 * {
@@ -85,27 +85,35 @@ html {
 
 body {
   @apply bg-background text-foreground antialiased;
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(240, 10%, 15%, 0.15) 0, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(240, 10%, 10%, 0.1) 0, transparent 50%);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, hsla(38, 40%, 65%, 0.05) 0, transparent 70%);
   background-attachment: fixed;
 }
 
-/* === Basic Developer Styles === */
+/* === Editorial Monograph Styles === */
 
 .blog-card {
-  @apply relative overflow-hidden rounded-lg bg-card border border-border transition-all duration-200;
+  @apply relative overflow-hidden rounded-none bg-card/50 border border-border transition-colors duration-200;
 }
 
 .blog-card:hover {
-  @apply border-foreground/30 bg-muted/30;
-  transform: translateY(-2px);
+  @apply border-primary/50 bg-muted/30;
 }
 
 /* === Typography === */
-h1, h2, h3, h4, h5, h6 {
+h1, h2 {
+  font-family: 'Newsreader', Georgia, serif;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+
+h3, h4, h5, h6 {
   font-family: 'Inter', system-ui, sans-serif;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
+}
+
+.font-serif {
+  font-family: 'Newsreader', Georgia, serif !important;
 }
 
 .font-mono {
@@ -182,7 +190,7 @@ article code:not(pre code) {
 }
 
 .blog-tag {
-  @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border border-border bg-muted/50 text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/30;
+  @apply inline-flex items-center rounded-none px-2 py-1 text-xs font-medium border border-border bg-muted/40 text-muted-foreground transition-colors hover:text-foreground hover:border-primary/50;
 }
 
 @layer utilities {
