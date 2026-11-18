@@ -18,3 +18,4 @@ Each item links to a companion markdown file; under `docs/features/` you also ha
 
 - [DOMAIN_MIGRATION.md](./DOMAIN_MIGRATION.md) — Canonical domain (`truongsoftware.com`), nginx/DNS checklist
 - [REPO_HYGIENE.md](./REPO_HYGIENE.md) — Ignored paths, dependency notes, disabled routes
+- [UI_STYLES.md](./UI_STYLES.md) — Comparison & branch reference for the 3 portfolio UI themes (`Style 1` active on `main`)
